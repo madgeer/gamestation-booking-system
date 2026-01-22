@@ -1,1 +1,11 @@
 # Dependencies (misal: get_current_user, get_db)
+from typing import Generator
+from app.db.sessions import SessionLocal
+
+def get_db() -> Generator:
+    try:
+        db = SessionLocal()
+        yield db
+
+    finally:
+        db.close()
