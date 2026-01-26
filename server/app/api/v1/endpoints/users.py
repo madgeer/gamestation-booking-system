@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.schemas.user import UserCreate, UserResponse
 from app.crud import crud_user
+from app.models.user import User
 
 router = APIRouter()
 
@@ -18,3 +19,9 @@ def register_new_user(user_in: UserCreate, db: Session = Depends(deps.get_db)):
     
     user = crud_user.create_user(db, user=user_in)
     return user
+
+@router.get("/me", response_model=UserResponse)
+def read_user_me(
+    current_user: User = Depends(deps.get_current_user),
+):
+    return current_user
