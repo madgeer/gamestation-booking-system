@@ -54,3 +54,10 @@ def create_booking(db: Session, booking_in: BookingCreate, user_id: int):
     db.commit()
     db.refresh(db_booking)
     return db_booking
+
+
+def get_booking_by_id(db: Session, booking_id: int):
+    return db.query(Booking).filter(Booking.user_id == booking_id).first()
+
+def get_booking_by_user(db: Session, user_id: int):
+    return db.query(Booking).filter(Booking.user_id == user_id).all()
