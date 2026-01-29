@@ -26,3 +26,7 @@ class BookingResponse(BaseModel):
 
 class BookingDetail(BookingResponse):
     addons: List[BookingAddonResponse] = []
+
+
+class BookingUpdateStatus(BaseModel):
+    payment_status: str

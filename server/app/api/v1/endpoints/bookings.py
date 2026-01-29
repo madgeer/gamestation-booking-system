@@ -11,6 +11,13 @@ from typing import List
 
 router = APIRouter()
 
+from app.schemas.booking import (
+    BookingCreate,
+    BookingResponse,
+    BookingDetail,
+    BookingUpdateStatus
+)
+
 @router.post("/", response_model=BookingResponse)
 def create_new_booking(
     booking_in: BookingCreate,
@@ -60,5 +67,22 @@ def read_booking_detail(
     
     if booking.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to view this booking")
+    
+    return booking
+
+@router.patch("/{booking_id}/payment", response_model=BookingResponse)
+def update_booking_payment(
+    booking_id: int,
+    status_in: BookingUpdateStatus,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Kasir update status pembayaran (Pending -> Paid).
+    """
+    booking = crud_booking.update_payment_status(db, booking_id, status_in)
+
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
     
     return booking

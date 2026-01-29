@@ -6,7 +6,8 @@ import uuid
 from sqlalchemy.orm import Session
 from app.models.booking import Booking, BookingStatus
 from app.models.room import Room
-from app.schemas.booking import BookingCreate
+from app.schemas.booking import BookingCreate, BookingUpdateStatus
+
 
 def check_availability(db: Session, room_id: int, start_time, end_time):
     overlap = db.query(Booking).filter(
@@ -61,3 +62,18 @@ def get_booking_by_id(db: Session, booking_id: int):
 
 def get_booking_by_user(db: Session, user_id: int):
     return db.query(Booking).filter(Booking.user_id == user_id).all()
+
+def update_payment_status(db: Session, booking_id: int, status_in: BookingUpdateStatus):
+    booking = db.query(Booking).filter(Booking.id == booking_id).first()
+    if not booking:
+        return None
+    
+    booking.payment_status = status_in.payment_status
+
+    if status_in.payment_status == "paid":
+        booking.status = "active"
+
+    db.add(booking)
+    db.commit()
+    db.refresh(booking)
+    return booking
