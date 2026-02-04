@@ -2,11 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api import deps
 from app.models.user import User
-from app.schemas.booking import BookingCreate, BookingResponse, BookingDetail
+from app.schemas.booking import BookingCreate, BookingResponse, BookingDetail, BookingReport
 from app.crud import crud_booking
 from app.schemas.booking_addon import BookingAddonCreate, BookingAddonResponse
 from app.crud import crud_booking_addon
 from typing import List
+from datetime import date
+
 
 
 router = APIRouter()
@@ -53,6 +55,26 @@ def read_my_booking(
     current_user: User = Depends(deps.get_current_user)
 ):
     return crud_booking.get_booking_by_user(db, user_id=current_user.id)
+
+@router.get("/report", response_model=BookingReport)
+def get_daily_report(
+    report_date: date = date.today(), #default
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Dashboard Admin: Lihat omzet & booking harian.
+    """
+    bookings = crud_booking.get_bookings_by_date(db, report_date)
+    
+    total_revenue = sum(b.total_price for b in bookings)
+    
+    return {
+        "date": report_date,
+        "total_bookings": len(bookings),
+        "total_revenue": total_revenue,
+        "bookings": bookings
+    }
 
 @router.get("/{booking_id}", response_model=BookingDetail)
 def read_booking_detail(

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional, List
 from app.schemas.booking_addon import BookingAddonResponse
 
@@ -30,3 +30,9 @@ class BookingDetail(BookingResponse):
 
 class BookingUpdateStatus(BaseModel):
     payment_status: str
+
+class BookingReport(BaseModel):
+    date: date
+    total_bookings: int
+    total_revenue: float
+    bookings: List[BookingResponse]

@@ -1,6 +1,6 @@
 from sqlalchemy.orm  import Session
 from sqlalchemy import and_
-from datetime import timedelta
+from datetime import date, time, timedelta, datetime
 import uuid
 
 from sqlalchemy.orm import Session
@@ -77,3 +77,13 @@ def update_payment_status(db: Session, booking_id: int, status_in: BookingUpdate
     db.commit()
     db.refresh(booking)
     return booking
+
+def get_bookings_by_date(db: Session, report_date: date):
+    start_of_day = datetime.combine(report_date, time.min)
+    end_of_day = datetime.combine(report_date, time.max)
+
+    return db.query(Booking).filter(
+        Booking.start_time >= start_of_day,
+        Booking.start_time <= end_of_day,
+        Booking.status != BookingStatus.CANCELLED
+    ).all()
