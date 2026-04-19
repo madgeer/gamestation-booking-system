@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from app.api.v1.api import api_router
 from app.core.config import settings
-
 from app.db.sessions import engine
 from app.db.base import Base
 
